@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import {
   Box,
   Divider,
@@ -6,10 +7,15 @@ import {
   TextField,
   Typography,
   Button,
+  CircularProgress,
 } from "@mui/material";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getTasks } from "./api/tasks";
-import { useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import TodoList from "../components/TodoList";
+import {
+  createTodoMutationOptions,
+  getTodoQueryOptions,
+  Task,
+} from "../options/todoOptions";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -21,18 +27,35 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const queryClient = useQueryClient();
   const [task, setTask] = useState("");
 
-  const query = useQuery({ queryKey: ["todos"], queryFn: getTasks });
+  const { data, isPending, isError, error } = useQuery(getTodoQueryOptions());
 
-  // const mutation = useMutation({
-  //   mutationFn: (data: { title: string; description: string }) =>
-  //     postTask(data),
-  //   onSuccess: () => {
-  //     queryClient.invalidateQueries({ queryKey: ["todos"] });
-  //   },
-  // });
+  const { mutate } = useMutation(createTodoMutationOptions());
+
+  const handleSubmit = (e: any) => {
+    e.preventDefault();
+
+    if (task.trim()) {
+      const temp = task;
+      setTask("");
+
+      const newTask: Task = {
+        userId: 2,
+        id: 3,
+        title: temp,
+        completed: false,
+      };
+
+      mutate(newTask);
+      console.log(newTask);
+    }
+  };
+
+  if (isError) {
+    alert("Something went wrong while fetching tasks - " + error);
+    return;
+  }
 
   return (
     <Box
@@ -42,45 +65,41 @@ function Home() {
       boxShadow={"lg"}
       sx={{ p: { xs: 2, md: 4 } }}
     >
-      <Typography variant="h3">TanStack Todo</Typography>
+      <Typography variant="h6">Your Tasks</Typography>
 
-      <Stack direction={"row"} spacing={2} mt={2}>
-        <TextField
-          value={task}
-          onChange={(e) => setTask(e.target.value)}
-          id="outlined-basic"
-          label="Enter your task"
-          variant="outlined"
-          size="small"
-        />
+      <form method="POST" onSubmit={handleSubmit}>
+        <Stack direction={"row"} spacing={2} mt={2}>
+          <TextField
+            value={task}
+            onChange={(e) => setTask(e.target.value)}
+            id="outlined-basic"
+            label="Enter your task"
+            variant="outlined"
+            size="small"
+          />
 
-        {/* <Button
-          variant="contained"
-          onClick={() => {
-            if (task.trim()) {
-              mutation.mutate({
-                title: task,
-                description: "Not provided", // You can make this dynamic if needed
-              });
-              setTask(""); // Clear the input field after adding the task
-            }
-          }}
-        >
-          Add
-        </Button> */}
-      </Stack>
-
+          <Button
+            type="submit"
+            variant="contained"
+            size="small"
+            sx={{ borderRadius: 4, boxShadow: "none" }}
+          >
+            Add
+          </Button>
+        </Stack>
+      </form>
       <Stack
         direction={"column"}
+        alignItems={"center"}
         spacing={1}
         mt={3}
         divider={<Divider orientation="horizontal" />}
       >
-        <ul>
-          {query.data?.map((todo) => (
-            <li key={todo._id}>{todo.title}</li>
-          ))}
-        </ul>
+        {isPending ? (
+          <CircularProgress color="secondary" size={26} />
+        ) : (
+          <TodoList tasks={data} />
+        )}
       </Stack>
     </Box>
   );
