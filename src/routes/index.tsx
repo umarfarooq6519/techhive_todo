@@ -16,6 +16,7 @@ import {
   getTodoQueryOptions,
   Task,
 } from "../options/todoOptions";
+import TodoForm from "../components/TodoForm";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -67,31 +68,12 @@ function Home() {
     >
       <Typography variant="h6">Your Tasks</Typography>
 
-      <form method="POST" onSubmit={handleSubmit}>
-        <Stack direction={"row"} spacing={2} mt={2}>
-          <TextField
-            value={task}
-            onChange={(e) => setTask(e.target.value)}
-            id="outlined-basic"
-            label="Enter your task"
-            variant="outlined"
-            size="small"
-          />
+      <TodoForm handleSubmit={handleSubmit} task={task} setTask={setTask} />
 
-          <Button
-            type="submit"
-            variant="contained"
-            size="small"
-            sx={{ borderRadius: 4, boxShadow: "none" }}
-          >
-            Add
-          </Button>
-        </Stack>
-      </form>
       <Stack
         direction={"column"}
         alignItems={"center"}
-        spacing={1}
+        spacing={0}
         mt={3}
         divider={<Divider orientation="horizontal" />}
       >

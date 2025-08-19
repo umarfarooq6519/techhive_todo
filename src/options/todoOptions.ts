@@ -1,3 +1,4 @@
+import { getTasks, createTask, updateTaskCompletion } from "../api/task.api";
 import { queryClient } from "../routes/__root";
 
 export function getTodoQueryOptions() {
@@ -24,20 +25,38 @@ export function createTodoMutationOptions() {
   };
 }
 
-const getTasks = async (): Promise<Task[]> => {
-  const res = await fetch(`https://jsonplaceholder.typicode.com/todos`);
-  return await res.json();
-};
+export function updateTaskCompletionMutationOptions() {
+  return {
+    mutationFn: updateTaskCompletion,
+    onMutate: async ({
+      taskId,
+      completed,
+    }: {
+      taskId: number;
+      completed: boolean;
+    }) => {
+      await queryClient.cancelQueries({ queryKey: ["tasks"] });
+      const prevTasks = queryClient.getQueryData(["tasks"]);
 
-const createTask = async (newPost: Task) => {
-  const res = await fetch("https://jsonplaceholder.typicode.com/todos", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(newPost),
-  });
+      queryClient.setQueryData(["tasks"], (old: any) => {
+        const tasks = old as Task[];
+        return tasks.map((task) =>
+          task.id === taskId ? { ...task, completed } : task
+        );
+      });
 
-  return res.json();
-};
+      return prevTasks;
+    },
+    onError: (error: any, variables: any, context: any) => {
+      // Rollback on error
+      queryClient.setQueryData(["tasks"], context);
+    },
+    // Refetch to ensure server state is synchronized
+    // onSettled: () => {
+    //   queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    // },
+  };
+}
 
 export type Task = {
   userId: number;
