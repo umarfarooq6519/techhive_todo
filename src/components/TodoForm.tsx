@@ -1,10 +1,11 @@
+import { Box } from "@mui/material";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 
 const TodoForm = ({ handleSubmit, task, setTask }) => {
   return (
-    <form method="POST" onSubmit={handleSubmit}>
+    <Box component={"form"} method="POST" onSubmit={handleSubmit}>
       <Stack direction={"row"} spacing={2} mt={2}>
         <TextField
           value={task}
@@ -24,7 +25,7 @@ const TodoForm = ({ handleSubmit, task, setTask }) => {
           Add
         </Button>
       </Stack>
-    </form>
+    </Box>
   );
 };
 
