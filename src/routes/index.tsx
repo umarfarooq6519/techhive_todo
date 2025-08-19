@@ -43,7 +43,7 @@ function Home() {
 
       const newTask: Task = {
         userId: 2,
-        id: 3,
+        id: Date.now(),
         title: temp,
         completed: false,
       };
@@ -63,6 +63,7 @@ function Home() {
       component="section"
       bgcolor={"#eeee"}
       borderRadius={4}
+      marginBlock={4}
       boxShadow={"lg"}
       sx={{ p: { xs: 2, md: 4 } }}
     >

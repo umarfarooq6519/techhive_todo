@@ -21,6 +21,7 @@ const TodoList = ({ tasks }: { tasks: any[] }) => {
       completed: !currentCompleted,
     });
   };
+
   return (
     <List sx={{ width: "100%" }}>
       {tasks.map((task) => (
@@ -29,9 +30,16 @@ const TodoList = ({ tasks }: { tasks: any[] }) => {
             onClick={() => handleToggleCompletion(task.id, task.completed)}
             style={{ cursor: "pointer" }}
           >
-            {task.completed ? <CheckCircle /> : <CircleOutlined />}
+            {task.completed ? (
+              <CheckCircle color="primary" />
+            ) : (
+              <CircleOutlined />
+            )}
           </ListItemAvatar>
-          <ListItemText primary={task.title} secondary={task.id} />
+          <ListItemText
+            sx={{ textDecoration: task.completed ? "line-through" : "none" }}
+            primary={task.title}
+          />
         </ListItem>
       ))}
     </List>

@@ -1,7 +1,9 @@
 import { Task } from "../options/todoOptions";
 
 export const getTasks = async (): Promise<Task[]> => {
-  const res = await fetch(`https://jsonplaceholder.typicode.com/todos`);
+  const res = await fetch(
+    `https://jsonplaceholder.typicode.com/todos?_limit=6`
+  );
   return await res.json();
 };
 
